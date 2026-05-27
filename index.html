@@ -1,787 +1,1573 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>GitHub Trending â å®æ¶æ¦å</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
+
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+
+
 :root {
+
   --bg-base: oklch(0.15 0.012 260);
+
   --bg-surface: oklch(0.18 0.012 260);
+
   --bg-elevated: oklch(0.21 0.012 260);
+
   --bg-hover: oklch(0.24 0.015 260);
+
   --text-primary: oklch(0.92 0.005 260);
+
   --text-secondary: oklch(0.68 0.015 260);
+
   --text-tertiary: oklch(0.48 0.015 260);
+
   --accent-weekly: oklch(0.72 0.18 40);
+
   --accent-daily: oklch(0.68 0.16 200);
+
   --accent-rising: oklch(0.7 0.17 340);
+
   --accent-glow-weekly: oklch(0.72 0.18 40 / 0.15);
+
   --accent-glow-daily: oklch(0.68 0.16 200 / 0.15);
+
   --accent-glow-rising: oklch(0.7 0.17 340 / 0.12);
+
   --border: oklch(0.28 0.015 260);
+
   --rank-gold: oklch(0.78 0.16 85);
+
   --rank-silver: oklch(0.72 0.04 220);
+
   --rank-bronze: oklch(0.65 0.1 55);
+
   --lang-ts: oklch(0.65 0.14 230);
+
   --lang-py: oklch(0.65 0.14 210);
+
   --lang-rs: oklch(0.65 0.14 30);
+
   --lang-go: oklch(0.65 0.14 190);
+
   --lang-js: oklch(0.68 0.16 85);
+
   --lang-cpp: oklch(0.65 0.14 270);
+
   --radius: 6px;
+
 }
+
+
 
 html { background: var(--bg-base); color: var(--text-primary); font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif; scroll-behavior: smooth; }
 
+
+
 body { min-height: 100vh; }
 
+
+
 /* Header */
+
 .header {
+
   padding: clamp(24px, 5vw, 48px) clamp(16px, 5vw, 48px);
+
   border-bottom: 1px solid var(--border);
+
   position: sticky; top: 0; z-index: 100;
+
   background: oklch(0.15 0.012 260 / 0.85);
+
   backdrop-filter: blur(20px) saturate(1.4);
+
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
+
 }
 
+
+
 .header-inner {
+
   max-width: 1200px; margin: 0 auto;
+
   display: flex; align-items: baseline; justify-content: space-between;
+
   flex-wrap: wrap; gap: 12px;
+
 }
+
+
 
 .logo-group { display: flex; align-items: baseline; gap: 10px; }
 
+
+
 .logo-icon {
+
   width: 28px; height: 28px;
+
   background: var(--text-primary);
+
   border-radius: 50%;
+
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z'/%3E%3C/svg%3E") center/contain no-repeat;
+
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z'/%3E%3C/svg%3E") center/contain no-repeat;
+
 }
+
+
 
 .logo-text {
+
   font-family: 'JetBrains Mono', monospace;
+
   font-size: clamp(14px, 2.5vw, 16px);
+
   font-weight: 600;
+
   letter-spacing: -0.5px;
+
 }
+
+
 
 .logo-sub {
+
   font-size: clamp(11px, 1.8vw, 13px);
+
   color: var(--text-tertiary);
+
   font-weight: 300;
+
 }
+
+
 
 .date-badge {
+
   font-size: 13px; color: var(--text-secondary);
+
   font-weight: 400;
+
 }
+
+
 
 /* Tabs */
+
 .tab-bar {
+
   max-width: 1200px; margin: 0 auto;
+
   display: flex; gap: 0;
+
   padding: 0 clamp(16px, 5vw, 48px);
+
   border-bottom: 1px solid var(--border);
+
   overflow-x: auto;
+
 }
 
+
+
 .tab-btn {
+
   background: none; border: none; color: var(--text-tertiary);
+
   font-family: inherit; font-size: 14px; font-weight: 500;
+
   padding: 14px 24px; cursor: pointer;
+
   position: relative; transition: color 0.2s;
+
   white-space: nowrap;
+
   letter-spacing: 0.3px;
+
 }
+
+
 
 .tab-btn:hover { color: var(--text-secondary); }
 
+
+
 .tab-btn.active { color: var(--text-primary); }
 
+
+
 .tab-btn.active::after {
+
   content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+
   height: 2px; border-radius: 1px;
+
 }
+
+
 
 .tab-btn[data-tab="weekly"].active::after { background: var(--accent-weekly); }
+
 .tab-btn[data-tab="daily"].active::after { background: var(--accent-daily); }
+
 .tab-btn[data-tab="rising"].active::after { background: var(--accent-rising); }
 
+
+
 .tab-badge {
+
   font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px;
+
   margin-left: 8px; vertical-align: middle;
+
 }
+
+
 
 .tab-badge.weekly { background: var(--accent-glow-weekly); color: var(--accent-weekly); }
+
 .tab-badge.daily { background: var(--accent-glow-daily); color: var(--accent-daily); }
+
 .tab-badge.rising { background: var(--accent-glow-rising); color: var(--accent-rising); }
 
+
+
 /* Content */
+
 .content {
+
   max-width: 1200px; margin: 0 auto;
+
   padding: clamp(16px, 3vw, 32px) clamp(16px, 5vw, 48px) clamp(48px, 8vw, 80px);
+
 }
+
+
 
 .tab-panel { display: none; }
+
 .tab-panel.active { display: block; }
 
+
+
 /* Stats row */
+
 .stats-row {
+
   display: flex; gap: 24px; margin-bottom: 32px;
+
   flex-wrap: wrap;
+
 }
+
+
 
 .stat-card {
+
   background: var(--bg-surface); border-radius: var(--radius);
+
   padding: 16px 20px; flex: 1; min-width: 160px;
+
   border: 1px solid var(--border);
+
 }
+
+
 
 .stat-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+
 .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
 .stat-card.weekly .stat-value { color: var(--accent-weekly); }
+
 .stat-card.daily .stat-value { color: var(--accent-daily); }
+
 .stat-card.rising .stat-value { color: var(--accent-rising); }
 
+
+
 /* Repo list */
+
 .repo-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
 
+
+
 .repo-item {
+
   background: var(--bg-surface);
+
   padding: 16px 20px;
+
   display: grid;
+
   grid-template-columns: 48px 1fr auto;
+
   gap: 16px;
+
   align-items: start;
+
   transition: background 0.15s;
+
 }
+
+
 
 .repo-item:hover { background: var(--bg-hover); }
 
+
+
 .repo-rank {
+
   font-family: 'JetBrains Mono', monospace;
+
   font-size: 18px; font-weight: 700; text-align: center;
+
   line-height: 1; padding-top: 2px;
+
 }
 
+
+
 .rank-1 { color: var(--rank-gold); }
+
 .rank-2 { color: var(--rank-silver); }
+
 .rank-3 { color: var(--rank-bronze); }
+
 .rank-other { color: var(--text-tertiary); }
 
+
+
 .repo-rank .medal { font-size: 20px; display: block; }
+
 .repo-rank .num { font-size: 14px; }
+
+
 
 .repo-info { min-width: 0; }
 
+
+
 .repo-name {
+
   font-family: 'JetBrains Mono', monospace;
+
   font-size: 14px; font-weight: 600;
+
   color: var(--text-primary);
+
   text-decoration: none;
+
   word-break: break-all;
+
 }
+
+
 
 .repo-name:hover { text-decoration: underline; }
 
+
+
 .repo-desc-en {
+
   font-size: 13px; color: var(--text-secondary);
+
   margin-top: 4px; line-height: 1.5;
+
 }
+
+
 
 .repo-desc-cn {
+
   font-size: 12px; color: var(--text-tertiary);
+
   margin-top: 3px; line-height: 1.5;
+
   font-style: italic;
+
 }
+
+
 
 .repo-meta {
+
   display: flex; align-items: center; gap: 12px; margin-top: 8px;
+
   flex-wrap: wrap;
+
 }
+
+
 
 .repo-lang {
+
   font-size: 11px; color: var(--text-tertiary);
+
   display: flex; align-items: center; gap: 5px;
+
 }
+
+
 
 .lang-dot {
+
   width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+
 }
+
+
 
 .repo-stars {
+
   font-size: 11px; color: var(--text-tertiary);
+
   font-family: 'JetBrains Mono', monospace;
+
 }
+
+
 
 .repo-action {
+
   display: flex; align-items: center; gap: 12px;
+
 }
+
+
 
 .btn-star {
+
   background: var(--bg-elevated); border: 1px solid var(--border);
+
   color: var(--text-secondary); font-size: 12px; font-weight: 500;
+
   padding: 6px 14px; border-radius: var(--radius); cursor: pointer;
+
   font-family: inherit; transition: all 0.15s;
+
   white-space: nowrap;
+
 }
+
+
 
 .btn-star:hover {
+
   background: var(--bg-hover); border-color: oklch(0.4 0.015 260);
+
 }
 
+
+
 .btn-visit {
+
   background: none; border: 1px solid var(--border);
+
   color: var(--text-tertiary); font-size: 12px;
+
   padding: 6px 12px; border-radius: var(--radius); cursor: pointer;
+
   font-family: inherit; transition: all 0.15s;
+
   white-space: nowrap;
+
 }
+
+
 
 .btn-visit:hover { color: var(--text-primary); border-color: oklch(0.4 0.015 260); }
 
+
+
 /* Footer */
+
 .footer {
+
   text-align: center; padding: 32px 16px;
+
   color: var(--text-tertiary); font-size: 12px;
+
   border-top: 1px solid var(--border);
+
 }
+
+
 
 .footer a { color: var(--text-secondary); text-decoration: none; }
+
 .footer a:hover { text-decoration: underline; }
 
+
+
 /* Loading skeleton */
+
 .skeleton {
+
   animation: pulse 1.5s ease-in-out infinite;
+
 }
+
+
 
 @keyframes pulse {
+
   0%, 100% { opacity: 1; }
+
   50% { opacity: 0.4; }
+
 }
+
+
 
 .skeleton-line {
+
   height: 14px; background: var(--bg-elevated); border-radius: 4px;
+
   margin-bottom: 8px;
+
 }
+
+
 
 .skeleton-line.short { width: 60%; }
+
 .skeleton-line.medium { width: 80%; }
 
+
+
 /* Responsive */
+
 @media (max-width: 640px) {
+
   .repo-item { grid-template-columns: 36px 1fr; padding: 14px 14px; gap: 10px; }
+
   .repo-action { grid-column: 1 / -1; justify-content: flex-start; padding-top: 4px; }
+
   .repo-rank { font-size: 14px; }
+
   .tab-btn { padding: 12px 16px; font-size: 13px; }
+
 }
+
+
 
 /* Reduced motion */
+
 @media (prefers-reduced-motion: reduce) {
+
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+
 }
+
 </style>
+
 </head>
+
 <body>
 
+
+
 <header class="header">
+
   <div class="header-inner">
+
     <div class="logo-group">
+
       <div class="logo-icon"></div>
+
       <div>
+
         <div class="logo-text">GitHub Trending</div>
+
         <div class="logo-sub">å®æ¶å¼æºé¡¹ç®ç­åº¦æ¦å</div>
+
       </div>
+
     </div>
-    <div class="date-badge" id="dateBadge">2026-05-26</div>
+
+    <div class="date-badge" id="dateBadge">2026-05-27</div>
+
   </div>
+
 </header>
 
+
+
 <nav class="tab-bar" role="tablist">
+
   <button class="tab-btn active" data-tab="weekly" role="tab" aria-selected="true">
+
     å¨æ¦å<span class="tab-badge weekly">Weekly</span>
+
   </button>
+
   <button class="tab-btn" data-tab="daily" role="tab" aria-selected="false">
+
     æ¥æ¦å<span class="tab-badge daily">Daily</span>
+
   </button>
+
   <button class="tab-btn" data-tab="rising" role="tab" aria-selected="false">
+
     é£åæ¦<span class="tab-badge rising">Rising</span>
+
   </button>
+
 </nav>
+
+
 
 <main class="content">
 
+
+
   <!-- Weekly Panel -->
+
   <section class="tab-panel active" id="panel-weekly" role="tabpanel">
+
     <div class="stats-row">
+
       <div class="stat-card weekly">
+
         <div class="stat-label">æ¬å¨æ» Star æ°</div>
-        <div class="stat-value">68.4k</div>
+
+        <div class="stat-value">85.4k</div>
+
       </div>
+
       <div class="stat-card weekly">
+
         <div class="stat-label">ä¸æ¦é¡¹ç®</div>
+
         <div class="stat-value">10</div>
+
       </div>
+
       <div class="stat-card weekly">
+
         <div class="stat-label">ä¸»è¦è¯­è¨</div>
+
         <div class="stat-value" style="font-size:16px;padding-top:8px;">TypeScript</div>
+
       </div>
+
     </div>
+
     <div class="repo-list" id="weekly-list"></div>
+
   </section>
+
+
 
   <!-- Daily Panel -->
+
   <section class="tab-panel" id="panel-daily" role="tabpanel">
+
     <div class="stats-row">
+
       <div class="stat-card daily">
+
         <div class="stat-label">ä»æ¥æ» Star æ°</div>
-        <div class="stat-value">3.9k</div>
+
+        <div class="stat-value">15.4k</div>
+
       </div>
+
       <div class="stat-card daily">
+
         <div class="stat-label">ä¸æ¦é¡¹ç®</div>
+
         <div class="stat-value">10</div>
+
       </div>
+
       <div class="stat-card daily">
+
         <div class="stat-label">æ°é¢å­</div>
+
         <div class="stat-value" style="font-size:16px;padding-top:8px;">6 ä¸ª</div>
+
       </div>
+
     </div>
+
     <div class="repo-list" id="daily-list"></div>
+
   </section>
 
+
+
   <!-- Rising Panel -->
+
   <section class="tab-panel" id="panel-rising" role="tabpanel">
+
     <div class="stats-row">
+
       <div class="stat-card rising">
+
         <div class="stat-label">ä»æ¥é£åé¡¹ç®</div>
+
         <div class="stat-value">10</div>
+
       </div>
+
       <div class="stat-card rising">
+
         <div class="stat-label">å¹³åæ¶¨å¹</div>
-        <div class="stat-value">+287%</div>
+
+        <div class="stat-value">+10%</div>
+
       </div>
+
       <div class="stat-card rising">
+
         <div class="stat-label">ç­é¨é¢å</div>
+
         <div class="stat-value" style="font-size:16px;padding-top:8px;">AI Agent</div>
+
       </div>
+
     </div>
+
     <div class="repo-list" id="rising-list"></div>
+
   </section>
+
+
 
 </main>
 
+
+
 <footer class="footer">
-  <p>æ°æ®æ¥æº <a href="https://github.com/trending" target="_blank" rel="noopener">GitHub Trending</a> Â· æ´æ°æ¶é´ 2026-05-26</p>
+
+  <p>æ°æ®æ¥æº <a href="https://github.com/trending" target="_blank" rel="noopener">GitHub Trending</a> Â· æ´æ°æ¶é´ 2026-05-27</p>
+
 </footer>
 
+
+
 <script>
+
 const WEEKLY_DATA = [
+
   {
+
     rank: 1,
-    name: "colbymchenry / codegraph",
+
+    name: "colbymchenry/codegraph",
+
     url: "https://github.com/colbymchenry/codegraph",
-    descEn: "A pre-indexed code knowledge graph designed for AI coding agents including Claude Code, Codex, Cursor, OpenCode, and Hermes Agent. It drastically reduces token consumption and tool calls by providing a structured, graph-based representation of your entire codebase â all running 100% locally without any cloud dependency.",
-    descCn: "ä¸º Claude CodeãCodexãCursorãOpenCodeãHermes Agent ç­ AI ç¼ç¨å©æé¢æå»ºçä»£ç ç¥è¯å¾è°±ãéè¿å°æ´ä¸ªä»£ç åºè½¬åä¸ºç»æåå¾è¡¨ç¤ºï¼å¤§å¹åå° AI ç¼ç¨æ¶ç token æ¶èåå·¥å·è°ç¨æ¬¡æ°ï¼å®å¨æ¬å°è¿è¡ï¼æ éä»»ä½äºç«¯ä¾èµã",
+
+    descEn: "Pre-indexed code knowledge graph for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent â fewer tokens, fewer tool calls, 100% local",
+
+    descCn: "ä¸º Claude CodeãCodexãGeminiãCursor ç­ AI ç¼ç¨å©æé¢æå»ºçä»£ç ç¥è¯å¾è°±ï¼å¤§å¹åå° token æ¶èåå·¥å·è°ç¨æ¬¡æ°ï¼å®å¨æ¬å°è¿è¡ã",
+
     lang: "TypeScript",
-    stars: "20,208",
-    starsLabel: "stars this week"
+
+    stars: "28,789",
+
+    starsLabel: "WEEKLY_DATA",
+
   },
+
   {
+
     rank: 2,
-    name: "tinyhumansai / openhuman",
-    url: "https://github.com/tinyhumansai/openhuman",
-    descEn: "An ambitious open-source project to build your own Personal AI super intelligence. Built with Rust for maximum performance and safety, it runs entirely on-device â your data never leaves your machine. It combines LLM capabilities with local tool execution, file management, and system automation in a privacy-first architecture.",
-    descCn: "ä¸ä¸ªéå¿ååçå¼æºé¡¹ç®ï¼æ¨å¨æé å±äºä½ èªå·±çä¸ªäºº AI è¶çº§æºè½ãä½¿ç¨ Rust æå»ºä»¥è¿½æ±æè´æ§è½åå®å¨ï¼å®å¨å¨æ¬å°è®¾å¤è¿è¡ââä½ çæ°æ®æ°¸è¿ä¸ä¼ç¦»å¼ä½ çæºå¨ãå®å°å¤§æ¨¡åè½åä¸æ¬å°å·¥å·æ§è¡ãæä»¶ç®¡çåç³»ç»èªå¨åç»åï¼éç¨éç§ä¼åçæ¶æè®¾è®¡ã",
-    lang: "Rust",
-    stars: "19,177",
-    starsLabel: "stars this week"
-  },
-  {
-    rank: 3,
-    name: "Lum1104 / Understand-Anything",
+
+    name: "Lum1104/Understand-Anything",
+
     url: "https://github.com/Lum1104/Understand-Anything",
-    descEn: "A revolutionary approach to code comprehension: graphs that teach rather than graphs that impress. It transforms any codebase into an interactive, explorable knowledge graph where you can search nodes, trace dependencies, and ask natural language questions. Compatible with Claude Code, Codex, Cursor, Copilot, and Gemini CLI.",
-    descCn: "ä¸ç§é©å½æ§çä»£ç çè§£æ¹å¼ï¼éå¨æå­¦çå¾è°±èéç«æçå¯è§åãå®è½å°ä»»æä»£ç åºè½¬åä¸ºå¯äº¤äºãå¯æ¢ç´¢çç¥è¯å¾è°±ï¼æ¯æèç¹æç´¢ãä¾èµè¿½è¸ªåèªç¶è¯­è¨é®ç­ãå¼å®¹ Claude CodeãCodexãCursorãCopilotãGemini CLI ç­ä¸»æµ AI ç¼ç¨å·¥å·ã",
+
+    descEn: "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
+
+    descCn: "å°ä»»æä»£ç åºè½¬åä¸ºå¯äº¤äºçç¥è¯å¾è°±ï¼æ¯ææ¢ç´¢ãæç´¢åèªç¶è¯­è¨é®ç­ï¼å¼å®¹ Claude CodeãCodexãCursorãCopilotãGemini CLI ç­ä¸»æµ AI ç¼ç¨å·¥å·ã",
+
     lang: "TypeScript",
-    stars: "14,750",
-    starsLabel: "stars this week"
+
+    stars: "37,509",
+
+    starsLabel: "WEEKLY_DATA",
+
   },
+
   {
+
+    rank: 3,
+
+    name: "rohitg00/ai-engineering-from-scratch",
+
+    url: "https://github.com/rohitg00/ai-engineering-from-scratch",
+
+    descEn: "Learn it. Build it. Ship it for others.",
+
+    descCn: "ä»é¶å­¦ä¹  AI å·¥ç¨çå®ææç¨ï¼è¦çæå»ºå°äº¤ä»çå¨æµç¨ï¼ç®å GitHub ä¸å¢é¿æå¿«ç AI å·¥ç¨å­¦ä¹ èµæºä¹ä¸ã",
+
+    lang: "Python",
+
+    stars: "21,357",
+
+    starsLabel: "WEEKLY_DATA",
+
+  },
+
+  {
+
     rank: 4,
-    name: "mattpocock / skills",
-    url: "https://github.com/mattpocock/skills",
-    descEn: "A meticulously curated collection of Claude Code Skills by renowned TypeScript educator Matt Pocock. Each skill file has been tested in production environments and covers TypeScript patterns, library integrations, code generation workflows, and best practices â ready to drop into any Claude Code project for immediate productivity gains.",
-    descCn: "ç±ç¥å TypeScript æè²å®¶ Matt Pocock ç²¾å¿ç­éç Claude Code Skills å®æåéãæ¯ä¸ªæè½æä»¶é½ç»è¿äºçäº§ç¯å¢çä¸¥æ ¼éªè¯ï¼æ¶µç TypeScript è®¾è®¡æ¨¡å¼ãåºéææ¹æ¡ãä»£ç çæå·¥ä½æµåæä½³å®è·µââå¯ç´æ¥æ¾å¥ä»»ä½ Claude Code é¡¹ç®ä¸­ï¼ç«å³æåå¼åæçã",
-    lang: "TypeScript",
-    stars: "1,520",
-    starsLabel: "stars this week"
+
+    name: "tinyhumansai/openhuman",
+
+    url: "https://github.com/tinyhumansai/openhuman",
+
+    descEn: "Your Personal AI super intelligence. Private, Simple and extremely powerful.",
+
+    descCn: "ä½ çä¸ªäºº AI è¶çº§æºè½å©æï¼ç§å¯ãç®åä¸æå¶å¼ºå¤§ï¼ä½¿ç¨ Rust æå»ºï¼å®å¨æ¬å°è¿è¡ï¼æ°æ®æ°¸ä¸ç¦»å¼ä½ çè®¾å¤ã",
+
+    lang: "Rust",
+
+    stars: "28,586",
+
+    starsLabel: "WEEKLY_DATA",
+
   },
+
   {
+
     rank: 5,
-    name: "anthropics / financial-services",
-    url: "https://github.com/anthropics/financial-services",
-    descEn: "Anthropic's official financial services AI toolkit, providing pre-built agent workflows for real-world banking, insurance, and fintech scenarios. It includes specialized agents for fraud detection analysis, loan underwriting assistance, regulatory compliance checking, customer service automation, and financial report generation â all with enterprise-grade reliability.",
-    descCn: "Anthropic å®æ¹åå¸çéèè¡ä¸ AI å·¥å·åï¼ä¸ºé¶è¡ãä¿é©åéèç§æç­çå®ä¸å¡åºæ¯æä¾é¢æå»ºç Agent å·¥ä½æµãåå«æ¬ºè¯æ£æµåæãè´·æ¬¾å®¡æ¹è¾å©ãçç®¡åè§æ£æ¥ãå®¢æèªå¨ååè´¢æ¥çæç­ä¸ä¸ Agentââåå·å¤ä¼ä¸çº§çå¯é æ§ä¿éã",
+
+    name: "Imbad0202/academic-research-skills",
+
+    url: "https://github.com/Imbad0202/academic-research-skills",
+
+    descEn: "Academic Research Skills for Claude Code: research â write â review â revise â finalize",
+
+    descCn: "Claude Code å­¦æ¯ç ç©¶æè½å¥è£ï¼æ¶µçç ç©¶âæ°åâå®¡éâä¿®è®¢âå®ç¨¿çå®æ´å­¦æ¯å·¥ä½æµï¼å¤§å¹æåè®ºæåä½æçã",
+
     lang: "Python",
-    stars: "1,328",
-    starsLabel: "stars this week"
+
+    stars: "22,434",
+
+    starsLabel: "WEEKLY_DATA",
+
   },
+
   {
+
     rank: 6,
-    name: "NousResearch / hermes-agent",
-    url: "https://github.com/NousResearch/hermes-agent",
-    descEn: "A self-evolving, open-source AI Agent framework from Nous Research. It features autonomous task planning, dynamic tool discovery and invocation, multi-step reasoning chains, and a unique feedback loop that allows the agent to learn from its own execution traces â continuously improving without human intervention.",
-    descCn: "Nous Research æ¨åºçèªæè¿åå¼æº AI Agent æ¡æ¶ãå·å¤èªä¸»ä»»å¡è§åãå¨æå·¥å·åç°ä¸è°ç¨ãå¤æ­¥æ¨çé¾ï¼ä»¥åç¬ç¹çåé¦å¾ªç¯æºå¶ââAgent è½ä»èªèº«çæ§è¡è½¨è¿¹ä¸­æç»­å­¦ä¹ æ¹è¿ï¼æ éäººå·¥å¹²é¢å³å¯ä¸æ­æåè¡¨ç°ã",
-    lang: "Python",
-    stars: "1,302",
-    starsLabel: "stars this week"
+
+    name: "ruvnet/RuView",
+
+    url: "https://github.com/ruvnet/RuView",
+
+    descEn: "Ï RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection â all without a single pixel of video.",
+
+    descCn: "å°æ®é WiFi ä¿¡å·è½¬åä¸ºå®æ¶ç©ºé´æºè½ï¼å®ç°çå½ä½å¾çæµåå­å¨æ£æµï¼å®å¨æ éæåå¤´ï¼é©å½æ§çæ æ¥è§¦æç¥ææ¯ã",
+
+    lang: "Rust",
+
+    stars: "66,447",
+
+    starsLabel: "WEEKLY_DATA",
+
   },
+
   {
+
     rank: 7,
-    name: "can1357 / oh-my-pi",
-    url: "https://github.com/can1357/oh-my-pi",
-    descEn: "A next-generation terminal-based AI coding agent. Features include hash-anchored precise code edits, an optimized multi-tool harness, native LSP integration for intelligent completions, embedded Python runtime, headless browser automation, and a hierarchical subagent system â all controlled through an elegant terminal UI.",
-    descCn: "æ°ä¸ä»£ç»ç«¯ AI ç¼ç¨ Agentãæ ¸å¿ç¹æ§åæ¬åºäºåå¸éç¹çç²¾åä»£ç ç¼è¾ãä¼åçå¤å·¥å·è°åº¦å¼æãåç LSP éæå®ç°æºè½è¡¥å¨ãååµ Python è¿è¡æ¶ãæ å¤´æµè§å¨èªå¨åï¼ä»¥åå±çº§å¼å­ Agent ç³»ç»ââå¨é¨éè¿ä¼éçç»ç«¯çé¢ææ§ã",
-    lang: "TypeScript",
-    stars: "2,584",
-    starsLabel: "stars this week"
-  },
-  {
-    rank: 8,
-    name: "presenton / presenton",
-    url: "https://github.com/presenton/presenton",
-    descEn: "A fully open-source AI presentation generator with a comprehensive REST API. It serves as a free, self-hosted alternative to commercial tools like Gamma, Beautiful AI, and Decktopus. Supports markdown-to-slide conversion, AI-powered layout suggestions, custom theme engines, and one-click export to PowerPoint and PDF formats.",
-    descCn: "å®å¨å¼æºç AI æ¼ç¤ºæç¨¿çæå¨ï¼éå¸¦å®æ´ç REST APIãå¯ä½ä¸º GammaãBeautiful AIãDecktopus ç­åä¸äº§åçåè´¹èªé¨ç½²æ¿ä»£æ¹æ¡ãæ¯æ Markdown è½¬å¹»ç¯çãAI å¸å±æ¨èãèªå®ä¹ä¸»é¢å¼æï¼ä»¥åä¸é®å¯¼åº PowerPoint å PDF æ ¼å¼ã",
-    lang: "TypeScript",
-    stars: "1,787",
-    starsLabel: "stars this week"
-  },
-  {
-    rank: 9,
-    name: "Hmbown / DeepSeek-TUI",
-    url: "https://github.com/Hmbown/DeepSeek-TUI",
-    descEn: "A full-featured terminal UI that wraps DeepSeek models into a powerful programming agent. It enables you to write, refactor, debug, and deploy code entirely within your terminal â with split-pane file browsing, inline diff previews, integrated terminal commands, and Git-aware context management.",
-    descCn: "å° DeepSeek æ¨¡ååè£ä¸ºå¨åè½ç»ç«¯ UI çå¼ºå¤§ç¼ç¨ Agentãè®©ä½ å®å¨å¨ç»ç«¯åå®æç¼ç ãéæãè°è¯åé¨ç½²ââæ¯æåæ æä»¶æµè§ãåèå·®å¼é¢è§ãéæç»ç«¯å½ä»¤å Git æç¥çä¸ä¸æç®¡çã",
+
+    name: "HKUDS/ViMax",
+
+    url: "https://github.com/HKUDS/ViMax",
+
+    descEn: "ViMax: Agentic Video Generation (Director, Screenwriter, Producer, and Video Generator All-in-One)",
+
+    descCn: "é¦æ¸¯å¤§å­¦æ¨åºçæºè½ä½è§é¢çæç³»ç»ï¼å°å¯¼æ¼ãç¼å§ãå¶çäººåè§é¢çæå¨èä¸ºä¸ä½ï¼å®ç°ç«¯å°ç«¯ç AI è§é¢åä½ã",
+
     lang: "Python",
-    stars: "1,077",
-    starsLabel: "stars this week"
+
+    stars: "7,697",
+
+    starsLabel: "WEEKLY_DATA",
+
   },
+
   {
-    rank: 10,
-    name: "github / spec-kit",
-    url: "https://github.com/github/spec-kit",
-    descEn: "GitHub's official specification-driven development toolkit. It introduces a structured workflow where developers author formal specifications in a declarative format, and the toolkit automatically generates scaffold code, test suites, API documentation, and CI/CD pipeline configurations â bridging the gap between design documents and actual implementation.",
-    descCn: "GitHub å®æ¹æ¨åºçè§èé©±å¨å¼åå·¥å·åãå¼å¥ä¸ç§ç»æåå·¥ä½æµï¼å¼åèç¨å£°æå¼æ ¼å¼æ°åæ­£å¼è§æ ¼è¯´æï¼å·¥å·åèªå¨çæèææ¶ä»£ç ãæµè¯å¥ä»¶ãAPI ææ¡£å CI/CD æµæ°´çº¿éç½®ââå¼¥åè®¾è®¡ææ¡£ä¸å®éå®ç°ä¹é´çé¸¿æ²ã",
+
+    rank: 8,
+
+    name: "rohitg00/agentmemory",
+
+    url: "https://github.com/rohitg00/agentmemory",
+
+    descEn: "#1 Persistent memory for AI coding agents based on real-world benchmarks",
+
+    descCn: "åºäºçå®ä¸çåºåç AI ç¼ç¨æºè½ä½æä¹è®°å¿æ¹æ¡ï¼è®© AI ç¼ç¨å©æè·¨ä¼è¯ä¿æä¸ä¸æï¼åå°éå¤å·¥ä½ã",
+
     lang: "TypeScript",
-    stars: "712",
-    starsLabel: "stars this week"
+
+    stars: "18,386",
+
+    starsLabel: "WEEKLY_DATA",
+
+  },
+
+  {
+
+    rank: 9,
+
+    name: "can1357/oh-my-pi",
+
+    url: "https://github.com/can1357/oh-my-pi",
+
+    descEn: "AI Coding agent for the terminal â hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
+
+    descCn: "ç»ç«¯ AI ç¼ç¨æºè½ä½ï¼åºäºåå¸éç¹çç²¾åç¼è¾ãä¼åçå¤å·¥å·è°åº¦å¼æãLSP éæåå­æºè½ä½ç³»ç»ã",
+
+    lang: "TypeScript",
+
+    stars: "7,621",
+
+    starsLabel: "WEEKLY_DATA",
+
+  },
+
+  {
+
+    rank: 10,
+
+    name: "NVlabs/Sana",
+
+    url: "https://github.com/NVlabs/Sana",
+
+    descEn: "SANA: Efficient High-Resolution Image Synthesis with Linear Diffusion Transformer",
+
+    descCn: "NVIDIA å®éªå®¤æ¨åºç SANA æ¨¡åï¼åºäºçº¿æ§æ©æ£åæ¢å¨çé«æé«åè¾¨çå¾ååæææ¯ã",
+
+    lang: "Python",
+
+    stars: "7,736",
+
+    starsLabel: "WEEKLY_DATA",
+
   }
+
 ];
+
+
 
 const DAILY_DATA = [
+
   {
+
     rank: 1,
-    name: "Lum1104 / Understand-Anything",
+
+    name: "Lum1104/Understand-Anything",
+
     url: "https://github.com/Lum1104/Understand-Anything",
-    descEn: "Today's hottest repo continues to dominate. Understand-Anything builds interactive knowledge graphs from any codebase, allowing developers to visually explore architecture, search for specific logic paths, and ask natural language questions about the code. It works as a drop-in enhancement for Claude Code, Cursor, Copilot, and other AI coding tools.",
-    descCn: "ä»æ¥æç­é¡¹ç®æç»­é¸æ¦ãUnderstand-Anything ä»ä»»æä»£ç åºæå»ºäº¤äºå¼ç¥è¯å¾è°±ï¼è®©å¼åèè½å¤å¯è§åæ¢ç´¢æ¶æãæç´¢ç¹å®é»è¾è·¯å¾ï¼å¹¶ç¨èªç¶è¯­è¨å¯¹ä»£ç æé®ãå®å¯ä»¥ä½ä¸º Claude CodeãCursorãCopilot ç­ AI ç¼ç¨å·¥å·çå³æå³ç¨å¢å¼ºç»ä»¶ã",
+
+    descEn: "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
+
+    descCn: "å°ä»»æä»£ç åºè½¬åä¸ºå¯äº¤äºçç¥è¯å¾è°±ï¼æ¯ææ¢ç´¢ãæç´¢åèªç¶è¯­è¨é®ç­ï¼å¼å®¹ Claude CodeãCodexãCursorãCopilotãGemini CLI ç­ä¸»æµ AI ç¼ç¨å·¥å·ã",
+
     lang: "TypeScript",
-    stars: "892",
-    starsLabel: "stars today"
+
+    stars: "37,509",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 2,
-    name: "anomalyco / opencode",
-    url: "https://github.com/anomalyco/opencode",
-    descEn: "An open-source AI coding agent positioned as a free and extensible alternative to Claude Code. Built with a modular plugin architecture, it supports custom tool integrations, multiple LLM backends, and a community-driven marketplace. Developers can tailor it to their specific stack without vendor lock-in.",
-    descCn: "å¼æº AI ç¼ç¨ Agentï¼å®ä½ä¸º Claude Code çåè´¹å¯æ©å±æ¿ä»£æ¹æ¡ãéç¨æ¨¡ååæä»¶æ¶æï¼æ¯æèªå®ä¹å·¥å·éæãå¤ç§å¤§æ¨¡ååç«¯åç¤¾åºé©±å¨çæä»¶å¸åºãå¼åèå¯æ ¹æ®èªå·±çææ¯æ çµæ´»å®å¶ï¼é¿åä¾åºåéå®ã",
-    lang: "Rust",
-    stars: "429",
-    starsLabel: "stars today"
-  },
-  {
-    rank: 3,
-    name: "Axorax / awesome-free-apps",
-    url: "https://github.com/Axorax/awesome-free-apps",
-    descEn: "A meticulously curated list of the best completely free applications for both PC and mobile platforms. Every entry is verified to be genuinely free â no hidden subscriptions, no ads, no tracking, no data harvesting. Covers categories from productivity and design to development tools and system utilities.",
-    descCn: "ä¸ä»½ç²¾å¿ç­éç PC åç§»å¨ç«¯æä½³å®å¨åè´¹åºç¨åè¡¨ãæ¯ä¸ªæ¡ç®é½ç»è¿éªè¯ï¼ç¡®ä¿çæ­£åè´¹ââæ éèè®¢éãæ å¹¿åãæ è¿½è¸ªãæ æ°æ®æ¶éãæ¶µçä»çäº§åãè®¾è®¡å°å¼åå·¥å·åç³»ç»å®ç¨ç¨åºç­åä¸ªç±»å«ã",
+
+    name: "affaan-m/ECC",
+
+    url: "https://github.com/affaan-m/ECC",
+
+    descEn: "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.",
+
+    descCn: "æºè½ä½è°åº¦æ§è½ä¼åç³»ç»ï¼ä¸º Claude CodeãCodexãCursor ç­æä¾æè½ãæ¬è½ãè®°å¿ãå®å¨åç ç©¶ä¼åçå¼åæ¡æ¶ã",
+
     lang: "JavaScript",
-    stars: "192",
-    starsLabel: "stars today"
+
+    stars: "195,128",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
+    rank: 3,
+
+    name: "rohitg00/ai-engineering-from-scratch",
+
+    url: "https://github.com/rohitg00/ai-engineering-from-scratch",
+
+    descEn: "Learn it. Build it. Ship it for others.",
+
+    descCn: "ä»é¶å­¦ä¹  AI å·¥ç¨çå®ææç¨ï¼è¦çæå»ºå°äº¤ä»çå¨æµç¨ï¼ç®å GitHub ä¸å¢é¿æå¿«ç AI å·¥ç¨å­¦ä¹ èµæºä¹ä¸ã",
+
+    lang: "Python",
+
+    stars: "21,357",
+
+    starsLabel: "DAILY_DATA",
+
+  },
+
+  {
+
     rank: 4,
-    name: "anthropics / skills",
-    url: "https://github.com/anthropics/skills",
-    descEn: "Anthropic's official Agent Skills marketplace and specification. It provides a standardized way to package, share, and discover reusable Claude agent capabilities â from code generation patterns to domain-specific workflows. Think of it as npm for AI agent behaviors, with first-party curation and community contributions.",
-    descCn: "Anthropic å®æ¹ç Agent Skills å¸åºåè§èãæä¾æ ååçæ¹å¼æ¥æåãåäº«ååç°å¯å¤ç¨ç Claude Agent è½åââä»ä»£ç çææ¨¡å¼å°é¢åä¸å±å·¥ä½æµãå¯ä»¥çè§£ä¸º AI Agent è¡ä¸ºè½åç npmï¼å¼å·å®æ¹ç­å±åç¤¾åºè´¡ç®ã",
+
+    name: "anthropics/knowledge-work-plugins",
+
+    url: "https://github.com/anthropics/knowledge-work-plugins",
+
+    descEn: "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
+
+    descCn: "Anthropic å®æ¹å¼æºç Claude Cowork æä»¶ä»åºï¼å¸®å©ç¥è¯å·¥ä½èæåä¸ AI åä½çæçåè´¨éã",
+
     lang: "Python",
-    stars: "436",
-    starsLabel: "stars today"
+
+    stars: "16,899",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 5,
-    name: "TauricResearch / TradingAgents",
-    url: "https://github.com/TauricResearch/TradingAgents",
-    descEn: "A sophisticated multi-agent LLM framework for quantitative trading research. It simulates realistic market dynamics by having multiple AI agentsæ®æ¼ different market roles â analysts, traders, risk managers â who communicate and compete in a simulated trading environment, generating insights for real-world strategy development.",
-    descCn: "ç¨äºéåäº¤æç ç©¶çå¤æå¤æºè½ä½ LLM æ¡æ¶ãéè¿è®©å¤ä¸ª AI Agent æ®æ¼ä¸åçå¸åºè§è²ââåæå¸ãäº¤æåãé£æ§ç»çââå¨æ¨¡æäº¤æç¯å¢ä¸­ç¸äºæ²éåç«äºï¼çæå¯ç¨äºå®çç­ç¥å¼åçæ´å¯ã",
+
+    name: "mukul975/Anthropic-Cybersecurity-Skills",
+
+    url: "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+
+    descEn: "754 structured cybersecurity skills for AI agents Â· Mapped to 5 frameworks: MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, D3FEND & NIST AI RMF Â· agentskills.io standard Â· Works with Claude Code, GitHub Copilot, Codex CLI, Cursor, Gemini CLI & 20+ platforms Â· 26 security domains Â· Apache 2.0",
+
+    descCn: "754 ä¸ªç»æåç½ç»å®å¨æè½ï¼æ å°å° MITRE ATT&CKãNIST CSF 2.0 ç­ 5 ä¸ªæ¡æ¶ï¼å¼å®¹ 20+ AI ç¼ç¨å¹³å°ï¼è¦ç 26 ä¸ªå®å¨é¢åã",
+
     lang: "Python",
-    stars: "524",
-    starsLabel: "stars today"
+
+    stars: "10,405",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 6,
-    name: "garrytan / gstack",
-    url: "https://github.com/garrytan/gstack",
-    descEn: "Y Combinator CEO Garry Tan's personal, opinionated AI coding stack that he uses daily. It bundles 23 carefully configured tools that serve as virtual CEO, Designer, Engineering Manager, Release Manager, Documentation Engineer, and QA â essentially a complete AI-powered software team in a single repository.",
-    descCn: "Y Combinator CEO Garry Tan æ¥å¸¸ä½¿ç¨çä¸ªäºº AI ç¼ç¨å¥ä»¶ãå®æåäº 23 ä¸ªç²¾å¿éç½®çå·¥å·ï¼åå«æ®æ¼èæ CEOãè®¾è®¡å¸ãå·¥ç¨ç»çãåå¸ç»çãææ¡£å·¥ç¨å¸å QAââæ¬è´¨ä¸æ¯ä¸ä¸ªå®æ´ç AI é©±å¨è½¯ä»¶å¼åå¢éï¼æµç¼©å¨ä¸ä¸ªä»åºä¸­ã",
-    lang: "TypeScript",
-    stars: "561",
-    starsLabel: "stars today"
+
+    name: "hardikpandya/stop-slop",
+
+    url: "https://github.com/hardikpandya/stop-slop",
+
+    descEn: "A skill file for removing AI tells from prose",
+
+    descCn: "ç¨äºå»é¤ææ¬ä¸­ AI çè¿¹çæè½æä»¶ï¼è®© AI çæçææ¬æ´èªç¶ãæ´åäººç±»åä½é£æ ¼ã",
+
+    lang: "Unknown",
+
+    stars: "5,240",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 7,
-    name: "VoltAgent / awesome-design-md",
-    url: "https://github.com/VoltAgent/awesome-design-md",
-    descEn: "A comprehensive collection of design system templates purpose-built for the AI coding era. It provides production-ready design tokens, component specifications, and layout patterns formatted in Markdown â designed specifically to be consumed by AI coding agents for generating consistent, high-quality UI code across projects.",
-    descCn: "ä¸º AI ç¼ç¨æ¶ä»£ä¸é¨æé çè®¾è®¡ç³»ç»æ¨¡æ¿åéãæä¾çäº§å°±ç»ªçè®¾è®¡ tokenãç»ä»¶è§èåå¸å±æ¨¡å¼ï¼å¨é¨ä»¥ Markdown æ ¼å¼åç°ââä¸ä¸º AI ç¼ç¨ Agent è®¾è®¡ï¼ä½¿å¶è½å¤å¨ä¸åé¡¹ç®ä¸­çæä¸è´ãé«è´¨éç UI ä»£ç ã",
-    lang: "TypeScript",
-    stars: "657",
-    starsLabel: "stars today"
+
+    name: "Leonxlnx/taste-skill",
+
+    url: "https://github.com/Leonxlnx/taste-skill",
+
+    descEn: "Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop",
+
+    descCn: "èµäº AI è¯å¥½åå³çæè½ï¼é»æ­¢ AI çæåç¯ä¸å¾çå¹³åº¸åå®¹ï¼æååä½è´¨éåç¬ç¹æ§ã",
+
+    lang: "Shell",
+
+    stars: "22,882",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 8,
-    name: "datawhalechina / hello-agents",
-    url: "https://github.com/datawhalechina/hello-agents",
-    descEn: "Datawhale's comprehensive open-source tutorial for building intelligent agent systems, written entirely in Chinese. It takes learners from zero to building functional AI agents, covering core concepts like tool calling, memory management, planning algorithms, and multi-agent coordination â with hands-on projects and a supportive learning community.",
-    descCn: "Datawhale åºåçå¨é¢ä¸­ææºè½ä½ç³»ç»æå»ºå¼æºæç¨ãå¸¦é¢å­¦ä¹ èä»é¶åºç¡å°æå»ºåè½å®æ´ç AI Agentï¼è¦çå·¥å·è°ç¨ãè®°å¿ç®¡çãè§åç®æ³ãå¤æºè½ä½åä½ç­æ ¸å¿æ¦å¿µââéæå¨æå®è·µé¡¹ç®åå®åçå­¦ä¹ ç¤¾åºæ¯æã",
-    lang: "Python",
-    stars: "671",
-    starsLabel: "stars today"
+
+    name: "DigitalPlatDev/FreeDomain",
+
+    url: "https://github.com/DigitalPlatDev/FreeDomain",
+
+    descEn: "DigitalPlat FreeDomain: Free Domain For Everyone",
+
+    descCn: "ä¸ºæ¯ä¸ªäººæä¾åè´¹ååæå¡ï¼éä½ä¸ªäººå¼åèåå°å¢éçäºèç½åå¥é¨æ§ã",
+
+    lang: "HTML",
+
+    stars: "168,054",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 9,
-    name: "ruvnet / ruflo",
-    url: "https://github.com/ruvnet/ruflo",
-    descEn: "A powerful Claude multi-agent orchestration platform that lets you define, coordinate, and execute complex workflows across multiple Claude agents. It supports parallel execution, conditional branching, shared state management, and event-driven triggers â enabling sophisticated automation pipelines that single-agent setups cannot handle.",
-    descCn: "ä¸ä¸ªå¼ºå¤§ç Claude å¤æºè½ä½ç¼æå¹³å°ï¼è®©ä½ è½å¤å®ä¹ãåè°åæ§è¡è·¨å¤ä¸ª Claude Agent çå¤æå·¥ä½æµãæ¯æå¹¶è¡æ§è¡ãæ¡ä»¶åæ¯ãå±äº«ç¶æç®¡çåäºä»¶é©±å¨è§¦åââå®ç°å Agent è®¾ç½®æ æ³å¤ççå¤æèªå¨åæµæ°´çº¿ã",
-    lang: "TypeScript",
-    stars: "514",
-    starsLabel: "stars today"
+
+    name: "jellyfin/jellyfin",
+
+    url: "https://github.com/jellyfin/jellyfin",
+
+    descEn: "The Free Software Media System - Server Backend & API",
+
+    descCn: "å®å¨å¼æºçèªç±è½¯ä»¶åªä½ç³»ç»æå¡å¨ï¼æä¾å¼ºå¤§çåªä½ç®¡çåæµåªä½æ­æ¾è½åï¼æ¯ Plex çå¼æºæ¿ä»£æ¹æ¡ã",
+
+    lang: "C#",
+
+    stars: "52,486",
+
+    starsLabel: "DAILY_DATA",
+
   },
+
   {
+
     rank: 10,
-    name: "bytedance / UI-TARS-desktop",
-    url: "https://github.com/bytedance/UI-TARS-desktop",
-    descEn: "ByteDance's open-source multimodal GUI agent for desktop automation. It leverages vision-language models to see and understand your screen, then autonomously performs mouse clicks, keyboard inputs, and complex UI interactions. Designed as a research platform for advancing GUI agent capabilities across Windows, macOS, and Linux.",
-    descCn: "å­èè·³å¨å¼æºçå¤æ¨¡ææ¡é¢ GUI Agentãå©ç¨è§è§è¯­è¨æ¨¡åæ¥è§å¯åçè§£ä½ çå±å¹ï¼ç¶åèªä¸»æ§è¡é¼ æ ç¹å»ãé®çè¾å¥åå¤æç UI äº¤äºãå®ä½ä¸ºæ¨è¿è·¨ WindowsãmacOS å Linux ç GUI Agent è½åçç ç©¶å¹³å°ã",
-    lang: "Python",
-    stars: "476",
-    starsLabel: "stars today"
+
+    name: "Axorax/awesome-free-apps",
+
+    url: "https://github.com/Axorax/awesome-free-apps",
+
+    descEn: "Curated list of the best free apps for PC and mobile",
+
+    descCn: "ç²¾å¿ç­éç PC åç§»å¨ç«¯æä½³åè´¹åºç¨åè¡¨ï¼æ¯ä¸ªåºç¨é½ç»è¿éªè¯ç¡®ä¿çæ­£åè´¹ä¸è´¨éè¿ç¡¬ã",
+
+    lang: "JavaScript",
+
+    stars: "5,513",
+
+    starsLabel: "DAILY_DATA",
+
   }
+
 ];
+
+
 
 const RISING_DATA = [
+
   {
+
     rank: 1,
-    name: "phodal / routa",
-    url: "https://github.com/phodal/routa",
-    descEn: "A workspace-first multi-agent coordination platform gaining rapid traction. Routa enables teams to define shared specifications, orchestrate agents through Kanban-style boards, and leverage MCP/ACP/A2A protocols for seamless inter-agent communication. It's particularly popular among distributed teams building complex software with multiple specialized AI agents.",
-    descCn: "ä¸ä¸ªå·¥ä½åºä¼åçå¤æºè½ä½åä½å¹³å°ï¼è¿æå¢é¿è¿çãRouta è®©å¢éè½å¤å®ä¹å±äº«è§æ ¼ãéè¿çæ¿å¼çé¢ç¼æ Agentï¼å¹¶å©ç¨ MCP/ACP/A2A åè®®å®ç°æ ç¼çæºè½ä½é´éä¿¡ãå¨é£äºä½¿ç¨å¤ä¸ªä¸ä¸ AI Agent æå»ºå¤æè½¯ä»¶çåå¸å¼å¢éä¸­å°¤å¶åæ¬¢è¿ã",
+
+    name: "Lum1104/Understand-Anything",
+
+    url: "https://github.com/Lum1104/Understand-Anything",
+
+    descEn: "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
+
+    descCn: "å°ä»»æä»£ç åºè½¬åä¸ºå¯äº¤äºçç¥è¯å¾è°±ï¼æ¯ææ¢ç´¢ãæç´¢åèªç¶è¯­è¨é®ç­ï¼å¼å®¹ Claude CodeãCodexãCursorãCopilotãGemini CLI ç­ä¸»æµ AI ç¼ç¨å·¥å·ã",
+
     lang: "TypeScript",
-    stars: "+470",
-    starsLabel: "stars this week",
-    growth: "+387%"
+
+    stars: "+4,697",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+18%",
+
   },
+
   {
+
     rank: 2,
-    name: "dograh-hq / dograh",
-    url: "https://github.com/dograh-hq/dograh",
-    descEn: "An open-source voice AI platform experiencing explosive growth as a self-hosted alternative to commercial services like Vapi and Retell. It features a visual workflow builder for designing voice interactions, MCP support for tool integration, telephony capabilities, and a BYOK (bring your own key) model for LLM usage â all deployable on-premises.",
-    descCn: "ä¸ä¸ªå¼æºè¯­é³ AI å¹³å°ï¼ä½ä¸º Vapi å Retell ç­åä¸æå¡çèªé¨ç½²æ¿ä»£æ¹æ¡ï¼è¿æåç°çåå¼å¢é¿ãç¹è²åæ¬ç¨äºè®¾è®¡è¯­é³äº¤äºçå¯è§åå·¥ä½æµæå»ºå¨ãæ¯æå·¥å·éæç MCPãçµè¯åè½ï¼ä»¥å BYOKï¼èªå¸¦å¯é¥ï¼çå¤§æ¨¡åä½¿ç¨æ¨¡å¼ââå¨é¨å¯é¨ç½²å¨æ¬å°ç¯å¢ä¸­ã",
-    lang: "Python",
-    stars: "+693",
-    starsLabel: "stars this week",
-    growth: "+351%"
+
+    name: "affaan-m/ECC",
+
+    url: "https://github.com/affaan-m/ECC",
+
+    descEn: "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.",
+
+    descCn: "æºè½ä½è°åº¦æ§è½ä¼åç³»ç»ï¼ä¸º Claude CodeãCodexãCursor ç­æä¾æè½ãæ¬è½ãè®°å¿ãå®å¨åç ç©¶ä¼åçå¼åæ¡æ¶ã",
+
+    lang: "JavaScript",
+
+    stars: "+1,915",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+7%",
+
   },
+
   {
+
     rank: 3,
-    name: "obra / superpowers",
-    url: "https://github.com/obra/superpowers",
-    descEn: "A comprehensive AI software development methodology framework that's gaining widespread adoption. It provides a structured approach to building software with AI agents, covering everything from requirements elicitation and system design to implementation, testing, and deployment â with specific patterns for when to use AI vs. human judgment.",
-    descCn: "ä¸ä¸ªå¨é¢ç AI è½¯ä»¶å¼åæ¹æ³è®ºæ¡æ¶ï¼æ­£å¨è·å¾å¹¿æ³éç¨ãå®æä¾äºä¸ç§ç»æåçæ¹æ³ï¼æå¯¼å¦ä½ç¨ AI Agent æå»ºè½¯ä»¶ï¼æ¶µçä»éæ±è·åãç³»ç»è®¾è®¡å°å®ç°ãæµè¯åé¨ç½²çå¨è¿ç¨ââå¹¶åå«ä½æ¶ä½¿ç¨ AI ä¸ä½æ¶ä¾èµäººç±»å¤æ­çå·ä½æ¨¡å¼ã",
-    lang: "Markdown",
-    stars: "+913",
-    starsLabel: "stars this week",
-    growth: "+298%"
-  },
-  {
-    rank: 4,
-    name: "affaan-m / everything-claude-code",
-    url: "https://github.com/affaan-m/everything-claude-code",
-    descEn: "The definitive encyclopedia for Claude Code configuration, experiencing rapid growth as more developers adopt the tool. It documents every setting, hidden feature, optimization trick, and workflow pattern â from basic setup to advanced multi-agent coordination. The repository serves as both reference and community knowledge base.",
-    descCn: "Claude Code éç½®çæå¨ç¾ç§å¨ä¹¦ï¼éçæ´å¤å¼åèéç¨è¯¥å·¥å·èå¿«éå¢é¿ãå®è®°å½äºæ¯ä¸ä¸ªè®¾ç½®é¡¹ãéèåè½ãä¼åæå·§åå·¥ä½æµæ¨¡å¼ââä»åºç¡éç½®å°é«çº§å¤æºè½ä½åä½ãè¯¥ä»åºæ¢æ¯åèæåï¼ä¹æ¯ç¤¾åºç¥è¯åºã",
-    lang: "Markdown",
-    stars: "+823",
-    starsLabel: "stars this week",
-    growth: "+276%"
-  },
-  {
-    rank: 5,
-    name: "farion1231 / cc-switch",
-    url: "https://github.com/farion1231/cc-switch",
-    descEn: "A one-click multi-model switcher for Claude Code that's seeing rapid adoption. It allows developers to seamlessly toggle between Claude models, GPT variants, Gemini, and local models without restarting or reconfiguring their environment. The tool preserves context and tool configurations across switches, making comparative testing and model selection effortless.",
-    descCn: "ä¸ä¸ªç¨äº Claude Code çä¸é®å¤æ¨¡ååæ¢å¨ï¼æ­£å¨è¢«å¿«ééç¨ãå®è®©å¼åèè½å¤å¨ä¸éå¯æéæ°éç½®ç¯å¢çæåµä¸ï¼å¨ Claude æ¨¡åãGPT åä½ãGemini åæ¬å°æ¨¡åä¹é´æ ç¼åæ¢ãè¯¥å·¥å·å¨åæ¢æ¶ä¿çä¸ä¸æåå·¥å·éç½®ï¼ä½¿æ¯è¾æµè¯åæ¨¡åéæ©åå¾è½»æ¾ã",
-    lang: "TypeScript",
-    stars: "+906",
-    starsLabel: "stars this week",
-    growth: "+254%"
-  },
-  {
-    rank: 6,
-    name: "addyosmani / agent-skills",
-    url: "https://github.com/addyosmani/agent-skills",
-    descEn: "Google Engineering Director Addy Osmani's collection of production-grade Agent Skills, gaining traction as a reference implementation for reliable AI coding. These skills encapsulate battle-tested patterns for web development, performance optimization, accessibility compliance, and large-scale codebase maintenance â reflecting Google's engineering rigor.",
-    descCn: "Google å·¥ç¨æ»ç Addy Osmani ççäº§çº§ Agent Skills åéï¼ä½ä¸ºå¯é  AI ç¼ç¨çåèå®ç°èè·å¾å³æ³¨ãè¿äºæè½å°è£äºç»è¿å®ææ£éªç Web å¼åãæ§è½ä¼åãæ éç¢åè§åå¤§è§æ¨¡ä»£ç åºç»´æ¤æ¨¡å¼ââä½ç°äº Google çå·¥ç¨ä¸¥è°¨æ§ã",
-    lang: "TypeScript",
-    stars: "+978",
-    starsLabel: "stars this week",
-    growth: "+231%"
-  },
-  {
-    rank: 7,
-    name: "multica-ai / andrej-karpathy-skills",
-    url: "https://github.com/multica-ai/andrej-karpathy-skills",
-    descEn: "A distillation of AI coding standards from Andrej Karpathy's insights and observations. This collection helps developers avoid common LLM coding pitfalls by providing concrete patterns for code structure, naming conventions, error handling, and testing strategies â essentially encoding Karpathy's mental models into reusable agent skills.",
-    descCn: "ä» Andrej Karpathy çæ´è§åè§å¯ä¸­æç¼ç AI ç¼ç¨æ ååéãéè¿ä¸ºä»£ç ç»æãå½åçº¦å®ãéè¯¯å¤çåæµè¯ç­ç¥æä¾å·ä½æ¨¡å¼ï¼å¸®å©å¼åèé¿åå¸¸è§ç LLM ç¼ç é·é±ââæ¬è´¨ä¸å° Karpathy çå¿æºæ¨¡åç¼ç ä¸ºå¯å¤ç¨ç Agent æè½ã",
-    lang: "Markdown",
-    stars: "+1,171",
-    starsLabel: "stars this week",
-    growth: "+198%"
-  },
-  {
-    rank: 8,
-    name: "datawhalechina / easy-vibe",
-    url: "https://github.com/datawhalechina/easy-vibe",
-    descEn: "A zero-to-hero Vibe Coding tutorial from Datawhale that's rapidly growing in popularity. It teaches developers how to build complete full-stack applications without writing a single line of code â using only natural language descriptions and AI agents. The tutorial covers frontend, backend, database design, and deployment across multiple platforms.",
-    descCn: "Datawhale åºåçé¶åºç¡ Vibe Coding æç¨ï¼è¿æäººæ°å¿«éä¸åãå®æä¼å¼åèå¦ä½å¨ä¸åä¸è¡ä»£ç çæåµä¸æå»ºå®æ´çå¨æ åºç¨ââä»ä½¿ç¨èªç¶è¯­è¨æè¿°å AI Agentãæç¨æ¶µçåç«¯ãåç«¯ãæ°æ®åºè®¾è®¡åè·¨å¹³å°é¨ç½²ã",
+
+    name: "rohitg00/ai-engineering-from-scratch",
+
+    url: "https://github.com/rohitg00/ai-engineering-from-scratch",
+
+    descEn: "Learn it. Build it. Ship it for others.",
+
+    descCn: "ä»é¶å­¦ä¹  AI å·¥ç¨çå®ææç¨ï¼è¦çæå»ºå°äº¤ä»çå¨æµç¨ï¼ç®å GitHub ä¸å¢é¿æå¿«ç AI å·¥ç¨å­¦ä¹ èµæºä¹ä¸ã",
+
     lang: "Python",
-    stars: "+401",
-    starsLabel: "stars this week",
-    growth: "+184%"
+
+    stars: "+2,155",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+8%",
+
   },
+
   {
+
+    rank: 4,
+
+    name: "anthropics/knowledge-work-plugins",
+
+    url: "https://github.com/anthropics/knowledge-work-plugins",
+
+    descEn: "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
+
+    descCn: "Anthropic å®æ¹å¼æºç Claude Cowork æä»¶ä»åºï¼å¸®å©ç¥è¯å·¥ä½èæåä¸ AI åä½çæçåè´¨éã",
+
+    lang: "Python",
+
+    stars: "+1,718",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+6%",
+
+  },
+
+  {
+
+    rank: 5,
+
+    name: "mukul975/Anthropic-Cybersecurity-Skills",
+
+    url: "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+
+    descEn: "754 structured cybersecurity skills for AI agents Â· Mapped to 5 frameworks: MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, D3FEND & NIST AI RMF Â· agentskills.io standard Â· Works with Claude Code, GitHub Copilot, Codex CLI, Cursor, Gemini CLI & 20+ platforms Â· 26 security domains Â· Apache 2.0",
+
+    descCn: "754 ä¸ªç»æåç½ç»å®å¨æè½ï¼æ å°å° MITRE ATT&CKãNIST CSF 2.0 ç­ 5 ä¸ªæ¡æ¶ï¼å¼å®¹ 20+ AI ç¼ç¨å¹³å°ï¼è¦ç 26 ä¸ªå®å¨é¢åã",
+
+    lang: "Python",
+
+    stars: "+880",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+3%",
+
+  },
+
+  {
+
+    rank: 6,
+
+    name: "hardikpandya/stop-slop",
+
+    url: "https://github.com/hardikpandya/stop-slop",
+
+    descEn: "A skill file for removing AI tells from prose",
+
+    descCn: "ç¨äºå»é¤ææ¬ä¸­ AI çè¿¹çæè½æä»¶ï¼è®© AI çæçææ¬æ´èªç¶ãæ´åäººç±»åä½é£æ ¼ã",
+
+    lang: "Unknown",
+
+    stars: "+539",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+2%",
+
+  },
+
+  {
+
+    rank: 7,
+
+    name: "Leonxlnx/taste-skill",
+
+    url: "https://github.com/Leonxlnx/taste-skill",
+
+    descEn: "Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop",
+
+    descCn: "èµäº AI è¯å¥½åå³çæè½ï¼é»æ­¢ AI çæåç¯ä¸å¾çå¹³åº¸åå®¹ï¼æååä½è´¨éåç¬ç¹æ§ã",
+
+    lang: "Shell",
+
+    stars: "+1,430",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+5%",
+
+  },
+
+  {
+
+    rank: 8,
+
+    name: "DigitalPlatDev/FreeDomain",
+
+    url: "https://github.com/DigitalPlatDev/FreeDomain",
+
+    descEn: "DigitalPlat FreeDomain: Free Domain For Everyone",
+
+    descCn: "ä¸ºæ¯ä¸ªäººæä¾åè´¹ååæå¡ï¼éä½ä¸ªäººå¼åèåå°å¢éçäºèç½åå¥é¨æ§ã",
+
+    lang: "HTML",
+
+    stars: "+1,219",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+4%",
+
+  },
+
+  {
+
     rank: 9,
-    name: "cursor / plugins",
-    url: "https://github.com/cursor/plugins",
-    descEn: "Cursor IDE's official plugin specification and marketplace, experiencing growth as the Cursor ecosystem expands. It provides a standardized way to build, share, and install plugins that extend Cursor's capabilities â from language servers and linters to custom AI tools and integration with external services. The specification ensures compatibility across plugin versions.",
-    descCn: "Cursor IDE çå®æ¹æä»¶è§èåæä»¶å¸åºï¼éç Cursor çæç³»ç»çæ©å±èå¢é¿ãå®æä¾äºä¸ç§æ ååçæ¹å¼æ¥æå»ºãåäº«åå®è£æ©å± Cursor åè½çæä»¶ââä»è¯­è¨æå¡å¨åä»£ç æ£æ¥å¨å°èªå®ä¹ AI å·¥å·åå¤é¨æå¡éæãè¯¥è§èç¡®ä¿æä»¶çæ¬é´çå¼å®¹æ§ã",
-    lang: "TypeScript",
-    stars: "+366",
-    starsLabel: "stars this week",
-    growth: "+167%"
+
+    name: "jellyfin/jellyfin",
+
+    url: "https://github.com/jellyfin/jellyfin",
+
+    descEn: "The Free Software Media System - Server Backend & API",
+
+    descCn: "å®å¨å¼æºçèªç±è½¯ä»¶åªä½ç³»ç»æå¡å¨ï¼æä¾å¼ºå¤§çåªä½ç®¡çåæµåªä½æ­æ¾è½åï¼æ¯ Plex çå¼æºæ¿ä»£æ¹æ¡ã",
+
+    lang: "C#",
+
+    stars: "+83",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+1%",
+
   },
+
   {
+
     rank: 10,
-    name: "multica-ai / claude-code-best-practices",
-    url: "https://github.com/multica-ai/claude-code-best-practices",
-    descEn: "A community-curated collection of Claude Code best practices that's gaining recognition as the go-to resource. It aggregates effective prompts, proven workflows, configuration patterns, and troubleshooting guides from experienced users â continuously updated based on real-world usage and emerging patterns in AI-assisted development.",
-    descCn: "ä¸ä¸ªç¤¾åºæ´çç Claude Code æä½³å®è·µåéï¼æ­£å¨æä¸ºé¦éåèèµæºãå®æ±éäºç»éªä¸°å¯ç¨æ·çæææç¤ºè¯ãç»è¿éªè¯çå·¥ä½æµãéç½®æ¨¡å¼åæéæé¤æåââæ ¹æ®å®éä½¿ç¨æåµå AI è¾å©å¼åä¸­çæ°å´æ¨¡å¼æç»­æ´æ°ã",
-    lang: "Markdown",
-    stars: "+312",
-    starsLabel: "stars this week",
-    growth: "+145%"
+
+    name: "Axorax/awesome-free-apps",
+
+    url: "https://github.com/Axorax/awesome-free-apps",
+
+    descEn: "Curated list of the best free apps for PC and mobile",
+
+    descCn: "ç²¾å¿ç­éç PC åç§»å¨ç«¯æä½³åè´¹åºç¨åè¡¨ï¼æ¯ä¸ªåºç¨é½ç»è¿éªè¯ç¡®ä¿çæ­£åè´¹ä¸è´¨éè¿ç¡¬ã",
+
+    lang: "JavaScript",
+
+    stars: "+731",
+
+    starsLabel: "RISING_DATA",
+
+    growth: "+2%",
+
   }
+
 ];
 
+
+
 function getLangColor(lang) {
+
   const map = {
+
     'TypeScript': 'var(--lang-ts)',
+
     'Python': 'var(--lang-py)',
+
     'Rust': 'var(--lang-rs)',
+
     'Go': 'var(--lang-go)',
+
     'JavaScript': 'var(--lang-js)',
+
     'C++': 'var(--lang-cpp)',
+
     'Markdown': 'var(--text-secondary)'
+
   };
+
   return map[lang] || 'var(--text-tertiary)';
+
 }
+
+
 
 function getRankClass(rank) {
+
   if (rank === 1) return 'rank-1';
+
   if (rank === 2) return 'rank-2';
+
   if (rank === 3) return 'rank-3';
+
   return 'rank-other';
+
 }
+
+
 
 function getRankDisplay(rank) {
+
   if (rank === 1) return '<span class="medal">ð¥</span>';
+
   if (rank === 2) return '<span class="medal">ð¥</span>';
+
   if (rank === 3) return '<span class="medal">ð¥</span>';
+
   return `<span class="num">${String(rank).padStart(2,'0')}</span>`;
+
 }
+
+
 
 function renderRepoItem(repo) {
+
   return `
+
     <div class="repo-item">
+
       <div class="repo-rank ${getRankClass(repo.rank)}">${getRankDisplay(repo.rank)}</div>
+
       <div class="repo-info">
+
         <a class="repo-name" href="${repo.url}" target="_blank" rel="noopener">${repo.name}</a>
+
         <div class="repo-desc-en">${repo.descEn}</div>
+
         <div class="repo-desc-cn">${repo.descCn}</div>
+
         <div class="repo-meta">
+
           <span class="repo-lang"><span class="lang-dot" style="background:${getLangColor(repo.lang)}"></span>${repo.lang}</span>
+
           <span class="repo-stars">â­ ${repo.stars} ${repo.starsLabel}</span>
+
           ${repo.growth ? `<span class="repo-stars" style="color:var(--accent-rising)">ð ${repo.growth}</span>` : ''}
+
         </div>
+
       </div>
+
       <div class="repo-action">
+
         <a href="${repo.url}" target="_blank" rel="noopener" class="btn-visit">æ¥ç â</a>
+
       </div>
+
     </div>
+
   `;
+
 }
+
+
 
 function renderList(containerId, data) {
+
   const container = document.getElementById(containerId);
+
   container.innerHTML = data.map(renderRepoItem).join('');
+
 }
 
+
+
 // Initialize
+
 document.addEventListener('DOMContentLoaded', () => {
+
   renderList('weekly-list', WEEKLY_DATA);
+
   renderList('daily-list', DAILY_DATA);
+
   renderList('rising-list', RISING_DATA);
 
+
+
   // Tab switching
+
   const tabs = document.querySelectorAll('.tab-btn');
+
   const panels = document.querySelectorAll('.tab-panel');
 
+
+
   tabs.forEach(tab => {
+
     tab.addEventListener('click', () => {
+
       const target = tab.dataset.tab;
+
       tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+
       panels.forEach(p => p.classList.remove('active'));
+
       tab.classList.add('active');
+
       tab.setAttribute('aria-selected', 'true');
+
       document.getElementById(`panel-${target}`).classList.add('active');
+
     });
+
   });
 
+
+
   // Set date
+
   const now = new Date();
+
   document.getElementById('dateBadge').textContent =
+
     `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
 });
+
 </script>
+
 </body>
+
 </html>
