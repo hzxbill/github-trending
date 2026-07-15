@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Trending — 实时榜单</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-base: oklch(0.15 0.012 260);
+  --bg-surface: oklch(0.18 0.012 260);
+  --bg-elevated: oklch(0.21 0.012 260);
+  --bg-hover: oklch(0.24 0.015 260);
+  --text-primary: oklch(0.92 0.005 260);
+  --text-secondary: oklch(0.68 0.015 260);
+  --text-tertiary: oklch(0.48 0.015 260);
+  --accent-weekly: oklch(0.72 0.18 40);
+  --accent-daily: oklch(0.68 0.16 200);
+  --accent-rising: oklch(0.7 0.17 340);
+  --accent-glow-weekly: oklch(0.72 0.18 40 / 0.15);
+  --accent-glow-daily: oklch(0.68 0.16 200 / 0.15);
+  --accent-glow-rising: oklch(0.7 0.17 340 / 0.12);
+  --border: oklch(0.28 0.015 260);
+  --rank-gold: oklch(0.78 0.16 85);
+  --rank-silver: oklch(0.72 0.04 220);
+  --rank-bronze: oklch(0.65 0.1 55);
+  --lang-ts: oklch(0.65 0.14 230);
+  --lang-py: oklch(0.65 0.14 210);
+  --lang-rs: oklch(0.65 0.14 30);
+  --lang-go: oklch(0.65 0.14 190);
+  --lang-js: oklch(0.68 0.16 85);
+  --lang-cpp: oklch(0.65 0.14 270);
+  --radius: 6px;
+}
+
+html { background: var(--bg-base); color: var(--text-primary); font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif; scroll-behavior: smooth; }
+
+body { min-height: 100vh; }
+
+/* Header */
+.header {
+  padding: clamp(24px, 5vw, 48px) clamp(16px, 5vw, 48px);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: oklch(0.15 0.012 260 / 0.85);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+
+.logo-group { display: flex; align-items: baseline; gap: 10px; }
+
+.logo-icon {
+  width: 28px; height: 28px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.logo-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(14px, 2.5vw, 16px);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.logo-sub {
+  font-size: clamp(11px, 1.8vw, 13px);
+  color: var(--text-tertiary);
+  font-weight: 300;
+}
+
+.date-badge {
+  font-size: 13px; color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Tabs */
+.tab-bar {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; gap: 0;
+  padding: 0 clamp(16px, 5vw, 48px);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none; border: none; color: var(--text-tertiary);
+  font-family: inherit; font-size: 14px; font-weight: 500;
+  padding: 14px 24px; cursor: pointer;
+  position: relative; transition: color 0.2s;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.tab-btn:hover { color: var(--text-secondary); }
+
+.tab-btn.active { color: var(--text-primary); }
+
+.tab-btn.active::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+  height: 2px; border-radius: 1px;
+}
+
+.tab-btn[data-tab="weekly"].active::after { background: var(--accent-weekly); }
+.tab-btn[data-tab="daily"].active::after { background: var(--accent-daily); }
+.tab-btn[data-tab="rising"].active::after { background: var(--accent-rising); }
+
+.tab-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px;
+  margin-left: 8px; vertical-align: middle;
+}
+
+.tab-badge.weekly { background: var(--accent-glow-weekly); color: var(--accent-weekly); }
+.tab-badge.daily { background: var(--accent-glow-daily); color: var(--accent-daily); }
+.tab-badge.rising { background: var(--accent-glow-rising); color: var(--accent-rising); }
+
+/* Content */
+.content {
+  max-width: 1200px; margin: 0 auto;
+  padding: clamp(16px, 3vw, 32px) clamp(16px, 5vw, 48px) clamp(48px, 8vw, 80px);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Stats row */
+.stats-row {
+  display: flex; gap: 24px; margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: var(--bg-surface); border-radius: var(--radius);
+  padding: 16px 20px; flex: 1; min-width: 160px;
+  border: 1px solid var(--border);
+}
+
+.stat-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+.stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+.stat-card.weekly .stat-value { color: var(--accent-weekly); }
+.stat-card.daily .stat-value { color: var(--accent-daily); }
+.stat-card.rising .stat-value { color: var(--accent-rising); }
+
+/* Repo list */
+.repo-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+
+.repo-item {
+  background: var(--bg-surface);
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 16px;
+  align-items: start;
+  transition: background 0.15s;
+}
+
+.repo-item:hover { background: var(--bg-hover); }
+
+.repo-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 700; text-align: center;
+  line-height: 1; padding-top: 2px;
+}
+
+.rank-1 { color: var(--rank-gold); }
+.rank-2 { color: var(--rank-silver); }
+.rank-3 { color: var(--rank-bronze); }
+.rank-other { color: var(--text-tertiary); }
+
+.repo-rank .medal { font-size: 20px; display: block; }
+.repo-rank .num { font-size: 14px; }
+
+.repo-info { min-width: 0; }
+
+.repo-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.repo-name:hover { text-decoration: underline; }
+
+.repo-desc-en {
+  font-size: 13px; color: var(--text-secondary);
+  margin-top: 4px; line-height: 1.5;
+}
+
+.repo-desc-cn {
+  font-size: 12px; color: var(--text-tertiary);
+  margin-top: 3px; line-height: 1.5;
+  font-style: italic;
+}
+
+.repo-meta {
+  display: flex; align-items: center; gap: 12px; margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.repo-lang {
+  font-size: 11px; color: var(--text-tertiary);
+  display: flex; align-items: center; gap: 5px;
+}
+
+.lang-dot {
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+}
+
+.repo-stars {
+  font-size: 11px; color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.repo-action {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.btn-star {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  color: var(--text-secondary); font-size: 12px; font-weight: 500;
+  padding: 6px 14px; border-radius: var(--radius); cursor: pointer;
+  font-family: inherit; transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-star:hover {
+  background: var(--bg-hover); border-color: oklch(0.4 0.015 260);
+}
+
+.btn-visit {
+  background: none; border: 1px solid var(--border);
+  color: var(--text-tertiary); font-size: 12px;
+  padding: 6px 12px; border-radius: var(--radius); cursor: pointer;
+  font-family: inherit; transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-visit:hover { color: var(--text-primary); border-color: oklch(0.4 0.015 260); }
+
+/* Footer */
+.footer {
+  text-align: center; padding: 32px 16px;
+  color: var(--text-tertiary); font-size: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.footer a { color: var(--text-secondary); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* Loading skeleton */
+.skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.skeleton-line {
+  height: 14px; background: var(--bg-elevated); border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.short { width: 60%; }
+.skeleton-line.medium { width: 80%; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .repo-item { grid-template-columns: 36px 1fr; padding: 14px 14px; gap: 10px; }
+  .repo-action { grid-column: 1 / -1; justify-content: flex-start; padding-top: 4px; }
+  .repo-rank { font-size: 14px; }
+  .tab-btn { padding: 12px 16px; font-size: 13px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-group">
+      <div class="logo-icon"></div>
+      <div>
+        <div class="logo-text">GitHub Trending</div>
+        <div class="logo-sub">实时开源项目热度榜单</div>
+      </div>
+    </div>
+    <div class="date-badge" id="dateBadge">2026-07-16</div>
+  </div>
+</header>
+
+<nav class="tab-bar" role="tablist">
+  <button class="tab-btn active" data-tab="weekly" role="tab" aria-selected="true">
+    周榜单<span class="tab-badge weekly">Weekly</span>
+  </button>
+  <button class="tab-btn" data-tab="daily" role="tab" aria-selected="false">
+    日榜单<span class="tab-badge daily">Daily</span>
+  </button>
+  <button class="tab-btn" data-tab="rising" role="tab" aria-selected="false">
+    飙升榜<span class="tab-badge rising">Rising</span>
+  </button>
+</nav>
+
+<main class="content">
+
+  <!-- Weekly Panel -->
+  <section class="tab-panel active" id="panel-weekly" role="tabpanel">
+    <div class="stats-row">
+      <div class="stat-card weekly">
+        <div class="stat-label">本周总 Star 数</div>
+        <div class="stat-value">207.8k</div>
+      </div>
+      <div class="stat-card weekly">
+        <div class="stat-label">上榜项目</div>
+        <div class="stat-value">10</div>
+      </div>
+      <div class="stat-card weekly">
+        <div class="stat-label">主要语言</div>
+        <div class="stat-value" style="font-size:16px;padding-top:8px;">TypeScript</div>
+      </div>
+    </div>
+    <div class="repo-list" id="weekly-list"></div>
+  </section>
+
+  <!-- Daily Panel -->
+  <section class="tab-panel" id="panel-daily" role="tabpanel">
+    <div class="stats-row">
+      <div class="stat-card daily">
+        <div class="stat-label">今日总 Star 数</div>
+        <div class="stat-value">539.3k</div>
+      </div>
+      <div class="stat-card daily">
+        <div class="stat-label">上榜项目</div>
+        <div class="stat-value">10</div>
+      </div>
+      <div class="stat-card daily">
+        <div class="stat-label">新面孔</div>
+        <div class="stat-value" style="font-size:16px;padding-top:8px;">10 个</div>
+      </div>
+    </div>
+    <div class="repo-list" id="daily-list"></div>
+  </section>
+
+  <!-- Rising Panel -->
+  <section class="tab-panel" id="panel-rising" role="tabpanel">
+    <div class="stats-row">
+      <div class="stat-card rising">
+        <div class="stat-label">今日飙升项目</div>
+        <div class="stat-value">10</div>
+      </div>
+      <div class="stat-card rising">
+        <div class="stat-label">平均涨幅</div>
+        <div class="stat-value">+5%</div>
+      </div>
+      <div class="stat-card rising">
+        <div class="stat-label">热门领域</div>
+        <div class="stat-value" style="font-size:16px;padding-top:8px;">TypeScript</div>
+      </div>
+    </div>
+    <div class="repo-list" id="rising-list"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>数据来源 <a href="https://github.com/trending" target="_blank" rel="noopener">GitHub Trending</a> · 更新时间 2026-07-16</p>
+</footer>
+
+<script>
+const WEEKLY_DATA = [
+  {
+    rank: 1,
+    name: "wonderwhy-er/DesktopCommanderMCP",
+    url: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+    descEn: "This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities",
+    descCn: "本周增长 2,009 stars this week，TypeScript 项目。This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities",
+    lang: "TypeScript",
+    stars: "8,304",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 2,
+    name: "google-labs-code/stitch-skills",
+    url: "https://github.com/google-labs-code/stitch-skills",
+    descEn: "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
+    descCn: "本周增长 975 stars this week，TypeScript 项目。A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
+    lang: "TypeScript",
+    stars: "7,408",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 3,
+    name: "abseil/abseil-cpp",
+    url: "https://github.com/abseil/abseil-cpp",
+    descEn: "Abseil Common Libraries (C++)",
+    descCn: "本周增长 637 stars this week，C++ 项目。Abseil Common Libraries (C++)",
+    lang: "C++",
+    stars: "17,993",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 4,
+    name: "iOfficeAI/OfficeCLI",
+    url: "https://github.com/iOfficeAI/OfficeCLI",
+    descEn: "OfficeCLI is the first and best Office suite purpose-built for AI agents to read, edit, and automate Word, Excel, and PowerPoint files. Free, open-source, single binary, no Office installation required.",
+    descCn: "本周增长 7,129 stars this week，C# 项目。OfficeCLI is the first and best Office suite purpose-built for AI agents to read, edit, and automate Word, Excel, and PowerPoint files. Free, open-source, single binary, no Office installation required.",
+    lang: "C#",
+    stars: "17,523",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 5,
+    name: "stablyai/orca",
+    url: "https://github.com/stablyai/orca",
+    descEn: "Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop and mobile.",
+    descCn: "本周增长 5,724 stars this week，TypeScript 项目。Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop and mobile.",
+    lang: "TypeScript",
+    stars: "19,713",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 6,
+    name: "chriskohlhoff/asio",
+    url: "https://github.com/chriskohlhoff/asio",
+    descEn: "Asio C++ Library",
+    descCn: "本周增长 245 stars this week，C++ 项目。Asio C++ Library",
+    lang: "C++",
+    stars: "6,172",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 7,
+    name: "HKUDS/Vibe-Trading",
+    url: "https://github.com/HKUDS/Vibe-Trading",
+    descEn: "\"Vibe-Trading: Your Personal Trading Agent\"",
+    descCn: "本周增长 4,252 stars this week，Python 项目。\"Vibe-Trading: Your Personal Trading Agent\"",
+    lang: "Python",
+    stars: "23,494",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 8,
+    name: "Nutlope/hallmark",
+    url: "https://github.com/Nutlope/hallmark",
+    descEn: "Anti-AI-slop design skill for Claude Code, Cursor, and Codex.",
+    descCn: "本周增长 2,274 stars this week，CSS 项目。Anti-AI-slop design skill for Claude Code, Cursor, and Codex.",
+    lang: "CSS",
+    stars: "7,443",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 9,
+    name: "oven-sh/bun",
+    url: "https://github.com/oven-sh/bun",
+    descEn: "Incredibly fast JavaScript runtime, bundler, test runner, and package manager – all in one",
+    descCn: "本周增长 1,257 stars this week，Rust 项目。Incredibly fast JavaScript runtime, bundler, test runner, and package manager – all in one",
+    lang: "Rust",
+    stars: "94,752",
+    starsLabel: "WEEKLY_DATA"
+  },
+  {
+    rank: 10,
+    name: "tt-a1i/archify",
+    url: "https://github.com/tt-a1i/archify",
+    descEn: "Any agent Skill: generate beautiful architecture diagrams with dark/light theme toggle and PNG/JPEG/WebP/SVG export",
+    descCn: "本周增长 1,519 stars this week，JavaScript 项目。Any agent Skill: generate beautiful architecture diagrams with dark/light theme toggle and PNG/JPEG/WebP/SVG export",
+    lang: "JavaScript",
+    stars: "4,979",
+    starsLabel: "WEEKLY_DATA"
+  },
+]
+
+const DAILY_DATA = [
+  {
+    rank: 1,
+    name: "OpenCut-app/OpenCut",
+    url: "https://github.com/OpenCut-app/OpenCut",
+    descEn: "The open-source CapCut alternative",
+    descCn: "今日新增 1,505 stars today，TypeScript 项目。The open-source CapCut alternative",
+    lang: "TypeScript",
+    stars: "70,735",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 2,
+    name: "Nutlope/hallmark",
+    url: "https://github.com/Nutlope/hallmark",
+    descEn: "Anti-AI-slop design skill for Claude Code, Cursor, and Codex.",
+    descCn: "今日新增 1,119 stars today，CSS 项目。Anti-AI-slop design skill for Claude Code, Cursor, and Codex.",
+    lang: "CSS",
+    stars: "7,443",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 3,
+    name: "mattpocock/skills",
+    url: "https://github.com/mattpocock/skills",
+    descEn: "Skills for Real Engineers. Straight from my .claude directory.",
+    descCn: "今日新增 2,160 stars today，Shell 项目。Skills for Real Engineers. Straight from my .claude directory.",
+    lang: "Shell",
+    stars: "171,836",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 4,
+    name: "moeru-ai/airi",
+    url: "https://github.com/moeru-ai/airi",
+    descEn: "💖🧸 Self hosted, you-owned Grok Companion, a container of souls of waifu, cyber livings to bring them into our worlds, wishing to achieve Neuro-sama's altitude. Capable of realtime voice chat, Minecraft, Factorio playing. Web / macOS / Windows supported.",
+    descCn: "今日新增 537 stars today，TypeScript 项目。💖🧸 Self hosted, you-owned Grok Companion, a container of souls of waifu, cyber livings to bring them into our worlds, wishing to achieve Neuro-sama's altitude. Capable of realtime voice chat, Minecraft, Factorio playing. Web / macOS / Windows supported.",
+    lang: "TypeScript",
+    stars: "42,385",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 5,
+    name: "Dicklesworthstone/destructive_command_guard",
+    url: "https://github.com/Dicklesworthstone/destructive_command_guard",
+    descEn: "The Destructive Command Guard (dcg) is for blocking dangerous git and shell commands from being executed by agents.",
+    descCn: "今日新增 497 stars today，Rust 项目。The Destructive Command Guard (dcg) is for blocking dangerous git and shell commands from being executed by agents.",
+    lang: "Rust",
+    stars: "4,640",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 6,
+    name: "HKUDS/Vibe-Trading",
+    url: "https://github.com/HKUDS/Vibe-Trading",
+    descEn: "\"Vibe-Trading: Your Personal Trading Agent\"",
+    descCn: "今日新增 924 stars today，Python 项目。\"Vibe-Trading: Your Personal Trading Agent\"",
+    lang: "Python",
+    stars: "23,494",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 7,
+    name: "openinterpreter/openinterpreter",
+    url: "https://github.com/openinterpreter/openinterpreter",
+    descEn: "A coding agent for low-cost models",
+    descCn: "今日新增 607 stars today，Rust 项目。A coding agent for low-cost models",
+    lang: "Rust",
+    stars: "65,259",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 8,
+    name: "HKUDS/DeepTutor",
+    url: "https://github.com/HKUDS/DeepTutor",
+    descEn: "DeepTutor: Lifelong Personalized Tutoring.https://deeptutor.info/.",
+    descCn: "今日新增 128 stars today，Python 项目。DeepTutor: Lifelong Personalized Tutoring.https://deeptutor.info/.",
+    lang: "Python",
+    stars: "26,115",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 9,
+    name: "HenryNdubuaku/maths-cs-ai-compendium",
+    url: "https://github.com/HenryNdubuaku/maths-cs-ai-compendium",
+    descEn: "Become a cracked AI/ML Research Engineer",
+    descCn: "今日新增 729 stars today，TypeScript 项目。Become a cracked AI/ML Research Engineer",
+    lang: "TypeScript",
+    stars: "5,736",
+    starsLabel: "DAILY_DATA"
+  },
+  {
+    rank: 10,
+    name: "Shubhamsaboo/awesome-llm-apps",
+    url: "https://github.com/Shubhamsaboo/awesome-llm-apps",
+    descEn: "100+ AI Agent & RAG apps you can actually run — clone, customize, ship.",
+    descCn: "今日新增 1,278 stars today，Python 项目。100+ AI Agent & RAG apps you can actually run — clone, customize, ship.",
+    lang: "Python",
+    stars: "121,682",
+    starsLabel: "DAILY_DATA"
+  },
+]
+
+const RISING_DATA = [
+  {
+    rank: 1,
+    name: "Nutlope/hallmark",
+    url: "https://github.com/Nutlope/hallmark",
+    descEn: "Anti-AI-slop design skill for Claude Code, Cursor, and Codex.",
+    descCn: "今日飙升 1,119 stars today，CSS 项目。Anti-AI-slop design skill for Claude Code, Cursor, and Codex.",
+    lang: "CSS",
+    stars: "7,443",
+    starsLabel: "RISING_DATA",
+    growth: "+15.0%"
+  },
+  {
+    rank: 2,
+    name: "HenryNdubuaku/maths-cs-ai-compendium",
+    url: "https://github.com/HenryNdubuaku/maths-cs-ai-compendium",
+    descEn: "Become a cracked AI/ML Research Engineer",
+    descCn: "今日飙升 729 stars today，TypeScript 项目。Become a cracked AI/ML Research Engineer",
+    lang: "TypeScript",
+    stars: "5,736",
+    starsLabel: "RISING_DATA",
+    growth: "+12.7%"
+  },
+  {
+    rank: 3,
+    name: "Dicklesworthstone/destructive_command_guard",
+    url: "https://github.com/Dicklesworthstone/destructive_command_guard",
+    descEn: "The Destructive Command Guard (dcg) is for blocking dangerous git and shell commands from being executed by agents.",
+    descCn: "今日飙升 497 stars today，Rust 项目。The Destructive Command Guard (dcg) is for blocking dangerous git and shell commands from being executed by agents.",
+    lang: "Rust",
+    stars: "4,640",
+    starsLabel: "RISING_DATA",
+    growth: "+10.7%"
+  },
+  {
+    rank: 4,
+    name: "HKUDS/Vibe-Trading",
+    url: "https://github.com/HKUDS/Vibe-Trading",
+    descEn: "\"Vibe-Trading: Your Personal Trading Agent\"",
+    descCn: "今日飙升 924 stars today，Python 项目。\"Vibe-Trading: Your Personal Trading Agent\"",
+    lang: "Python",
+    stars: "23,494",
+    starsLabel: "RISING_DATA",
+    growth: "+3.9%"
+  },
+  {
+    rank: 5,
+    name: "OpenCut-app/OpenCut",
+    url: "https://github.com/OpenCut-app/OpenCut",
+    descEn: "The open-source CapCut alternative",
+    descCn: "今日飙升 1,505 stars today，TypeScript 项目。The open-source CapCut alternative",
+    lang: "TypeScript",
+    stars: "70,735",
+    starsLabel: "RISING_DATA",
+    growth: "+2.1%"
+  },
+  {
+    rank: 6,
+    name: "moeru-ai/airi",
+    url: "https://github.com/moeru-ai/airi",
+    descEn: "💖🧸 Self hosted, you-owned Grok Companion, a container of souls of waifu, cyber livings to bring them into our worlds, wishing to achieve Neuro-sama's altitude. Capable of realtime voice chat, Minecraft, Factorio playing. Web / macOS / Windows supported.",
+    descCn: "今日飙升 537 stars today，TypeScript 项目。💖🧸 Self hosted, you-owned Grok Companion, a container of souls of waifu, cyber livings to bring them into our worlds, wishing to achieve Neuro-sama's altitude. Capable of realtime voice chat, Minecraft, Factorio playing. Web / macOS / Windows supported.",
+    lang: "TypeScript",
+    stars: "42,385",
+    starsLabel: "RISING_DATA",
+    growth: "+1.3%"
+  },
+  {
+    rank: 7,
+    name: "mattpocock/skills",
+    url: "https://github.com/mattpocock/skills",
+    descEn: "Skills for Real Engineers. Straight from my .claude directory.",
+    descCn: "今日飙升 2,160 stars today，Shell 项目。Skills for Real Engineers. Straight from my .claude directory.",
+    lang: "Shell",
+    stars: "171,836",
+    starsLabel: "RISING_DATA",
+    growth: "+1.3%"
+  },
+  {
+    rank: 8,
+    name: "Shubhamsaboo/awesome-llm-apps",
+    url: "https://github.com/Shubhamsaboo/awesome-llm-apps",
+    descEn: "100+ AI Agent & RAG apps you can actually run — clone, customize, ship.",
+    descCn: "今日飙升 1,278 stars today，Python 项目。100+ AI Agent & RAG apps you can actually run — clone, customize, ship.",
+    lang: "Python",
+    stars: "121,682",
+    starsLabel: "RISING_DATA",
+    growth: "+1.1%"
+  },
+  {
+    rank: 9,
+    name: "openinterpreter/openinterpreter",
+    url: "https://github.com/openinterpreter/openinterpreter",
+    descEn: "A coding agent for low-cost models",
+    descCn: "今日飙升 607 stars today，Rust 项目。A coding agent for low-cost models",
+    lang: "Rust",
+    stars: "65,259",
+    starsLabel: "RISING_DATA",
+    growth: "+0.9%"
+  },
+  {
+    rank: 10,
+    name: "HKUDS/DeepTutor",
+    url: "https://github.com/HKUDS/DeepTutor",
+    descEn: "DeepTutor: Lifelong Personalized Tutoring.https://deeptutor.info/.",
+    descCn: "今日飙升 128 stars today，Python 项目。DeepTutor: Lifelong Personalized Tutoring.https://deeptutor.info/.",
+    lang: "Python",
+    stars: "26,115",
+    starsLabel: "RISING_DATA",
+    growth: "+0.5%"
+  },
+]
+
+function getLangColor(lang) {
+  const map = {
+    'TypeScript': 'var(--lang-ts)',
+    'Python': 'var(--lang-py)',
+    'Rust': 'var(--lang-rs)',
+    'Go': 'var(--lang-go)',
+    'JavaScript': 'var(--lang-js)',
+    'C++': 'var(--lang-cpp)',
+    'Markdown': 'var(--text-secondary)'
+  };
+  return map[lang] || 'var(--text-tertiary)';
+}
+
+function getRankClass(rank) {
+  if (rank === 1) return 'rank-1';
+  if (rank === 2) return 'rank-2';
+  if (rank === 3) return 'rank-3';
+  return 'rank-other';
+}
+
+function getRankDisplay(rank) {
+  if (rank === 1) return '<span class="medal">🥇</span>';
+  if (rank === 2) return '<span class="medal">🥈</span>';
+  if (rank === 3) return '<span class="medal">🥉</span>';
+  return `<span class="num">${String(rank).padStart(2,'0')}</span>`;
+}
+
+function renderRepoItem(repo) {
+  return `
+    <div class="repo-item">
+      <div class="repo-rank ${getRankClass(repo.rank)}">${getRankDisplay(repo.rank)}</div>
+      <div class="repo-info">
+        <a class="repo-name" href="${repo.url}" target="_blank" rel="noopener">${repo.name}</a>
+        <div class="repo-desc-en">${repo.descEn}</div>
+        <div class="repo-desc-cn">${repo.descCn}</div>
+        <div class="repo-meta">
+          <span class="repo-lang"><span class="lang-dot" style="background:${getLangColor(repo.lang)}"></span>${repo.lang}</span>
+          <span class="repo-stars">⭐ ${repo.stars} ${repo.starsLabel}</span>
+          ${repo.growth ? `<span class="repo-stars" style="color:var(--accent-rising)">📈 ${repo.growth}</span>` : ''}
+        </div>
+      </div>
+      <div class="repo-action">
+        <a href="${repo.url}" target="_blank" rel="noopener" class="btn-visit">查看 →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderList(containerId, data) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = data.map(renderRepoItem).join('');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  renderList('weekly-list', WEEKLY_DATA);
+  renderList('daily-list', DAILY_DATA);
+  renderList('rising-list', RISING_DATA);
+
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      document.getElementById(`panel-${target}`).classList.add('active');
+    });
+  });
+
+  // Set date
+  const now = new Date();
+  document.getElementById('dateBadge').textContent =
+    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+});
+</script>
+</body>
+</html>
